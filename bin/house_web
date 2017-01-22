@@ -37,8 +37,8 @@ def pda():
     cond_day = w_day['conditions'].lower()
     return f'''
         <meta http-equiv="refresh" content="300">
-        <h3>{cond_now} {SPACE}{temp_now}&nbsp;C {SPACE}{rel_hum_now} {SPACE}{wind_now}&nbsp;м/с {SPACE}{pres_now}&nbsp;бар</h3>
-        <h3>{day} {cond_day}, от {low_day}&nbsp;C до {high_day}&nbsp;C и ветер до {max_wind_day}&nbsp;м/с</h3>
+        <h3>{cond_now}{SPACE} {temp_now}&nbsp;&deg;C{SPACE} {rel_hum_now}{SPACE} {wind_now}&nbsp;м/с{SPACE} {pres_now}&nbsp;бар</h3>
+        <h3>{day} {cond_day}, от {low_day}&nbsp;&deg;C до {high_day}&nbsp;&deg;C и ветер до {max_wind_day}&nbsp;м/с</h3>
     '''
 
 run(app, server='gunicorn', host='0.0.0.0', port=15134)
