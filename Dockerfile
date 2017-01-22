@@ -2,11 +2,14 @@ FROM python
 
 MAINTAINER Konstantin Malacnhev <hombit@gmail.com>
 
-COPY . /house
+RUN mkdir -p /house
 WORKDIR /house
 
-RUN pip install -r requirements.txt &&\
-    python setup.py install
+COPY requirements.txt /house/
+RUN pip install -r requirements.txt
+
+COPY . /house
+RUN python setup.py install
 
 EXPOSE 15134
 
