@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+
+
+from bottle import Bottle, request, run
+from house import weather
+
+
+app = Bottle()
+
+json_weather = app.get('/weather')(weather.get_weather)
+
+
+@app.get('/pda')
+def pda():
+    jw = json_weather()
+    w_now = jw['current_observation']
+    w_today = jw['forecast']['simpleforecast']['forecastday'][0]
+
+    temp_now = weather.temperature(w_now['temp_c'])
+    wind_now = weather.wind(w_now['wind_kph'])
+    rel_hum_now = w_now['relative_humidity']
+    pres_now = weather.pressure(w_now['pressure_mb'])
+
+    low_today = weather.temperature(w_today['low']['celsius'])
+    high_today = weather.temperature(w_today['high']['celsius'])
+    max_wind_today = weather.wind(w_today['maxwind']['kph'])
+    return f'''
+        <meta http-equiv="refresh" content="600; URL={request.url}">
+        <h2>{temp_now}&nbsp;C&nbsp;&nbsp;{rel_hum_now}&nbsp;&nbsp;{wind_now}&nbsp;м/с&nbsp;&nbsp;{pres_now}&nbsp;бар</h2>
+        <h2>Сегодня от {low_today}&nbsp;C до {high_today}&nbsp;C и ветер до {max_wind_today}&nbsp;м/с</h2>
+    '''
+
+run(app, host='0.0.0.0', port=15134)
+

@@ -1,0 +1,9 @@
+version: '2'
+services:
+   web:
+     build: .
+     volumes:
+      - ./secrets.json:/etc/house/secrets.json
+     ports:
+      - "127.0.0.1:15134:15134"
+     restart: always
