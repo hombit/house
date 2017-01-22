@@ -6,6 +6,9 @@ from house import weather
 from time import localtime
 
 
+SPACE = "<span style='padding-left:1em;'></span>"
+
+
 app = Bottle()
 
 json_weather = app.get('/weather')(weather.get_weather)
@@ -32,8 +35,8 @@ def pda():
     max_wind_day = weather.wind(w_day['maxwind']['kph'])
     return f'''
         <meta http-equiv="refresh" content="300">
-        <h2>{temp_now}&nbsp;C&nbsp;&nbsp;{rel_hum_now}&nbsp;&nbsp;{wind_now}&nbsp;м/с&nbsp;&nbsp;{pres_now}&nbsp;бар</h2>
-        <h2>{day} от {low_day}&nbsp;C до {high_day}&nbsp;C и ветер до {max_wind_day}&nbsp;м/с</h2>
+        <h3>{temp_now}&nbsp;C {SPACE}{rel_hum_now} {SPACE}{wind_now}&nbsp;м/с {SPACE}{pres_now}&nbsp;бар</h3>
+        <h3>{day} от {low_day}&nbsp;C до {high_day}&nbsp;C и ветер до {max_wind_day}&nbsp;м/с</h3>
     '''
 
 run(app, server='gunicorn', host='0.0.0.0', port=15134)

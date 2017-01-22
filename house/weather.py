@@ -33,5 +33,5 @@ def pressure(mbar):
 
 
 def temperature(x):
-    return str(x).replace('-', '&minus;')
+    return str(x).replace('-', '&minus;').replace('.', ',')
 
