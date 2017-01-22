@@ -25,7 +25,7 @@ def pda():
     high_today = weather.temperature(w_today['high']['celsius'])
     max_wind_today = weather.wind(w_today['maxwind']['kph'])
     return f'''
-        <meta http-equiv="refresh" content="600; URL={request.url}">
+        <meta http-equiv="refresh" content="300">
         <h2>{temp_now}&nbsp;C&nbsp;&nbsp;{rel_hum_now}&nbsp;&nbsp;{wind_now}&nbsp;м/с&nbsp;&nbsp;{pres_now}&nbsp;бар</h2>
         <h2>Сегодня от {low_today}&nbsp;C до {high_today}&nbsp;C и ветер до {max_wind_today}&nbsp;м/с</h2>
     '''
