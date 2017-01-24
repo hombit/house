@@ -60,7 +60,7 @@ def pda() -> str:
     ws = weather_strings()
     weather_html = '<h3>' + '</h3>\n<h3>'.join(ws) + '</h3>'
     return f'''
-        <meta http-equiv="refresh" content="{AUTO_REFRESH_RATE}">'
+        <meta http-equiv="refresh" content="{AUTO_REFRESH_RATE}">
         {weather_html}
     '''
 
