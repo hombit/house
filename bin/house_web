@@ -31,6 +31,12 @@ def weather_strings() -> Tuple[str, ...]:
         cond_now = w_now['weather']
         str_now = f'{cond_now}{SPACE} {temp_now}&nbsp;&deg;C{SPACE} {rel_hum_now}{SPACE} {wind_now}&nbsp;м/с{SPACE} {pres_now}&nbsp;бар'
 
+        w_astro = jw['moon_phase']
+        moon_phase = w_astro['phaseofMoon']
+        sunrise = weather.hour_minute(w_astro['sunrise'])
+        sunset = weather.hour_minute(w_astro['sunset'])
+        str_astro = f'{moon_phase}, Солнце на небе c {sunrise} до {sunset}'
+
         if localtime().tm_hour < 19:
             w_day = jw['forecast']['simpleforecast']['forecastday'][0]
             day = 'Сегодня'
@@ -46,7 +52,7 @@ def weather_strings() -> Tuple[str, ...]:
         return 'Информация о погоде недоступна',
     except Exception as e:
         return f'Exception of type {type(e)}: {e}',
-    return str_now, str_day
+    return str_now, str_astro, str_day
 
 
 @app.get('/pda')

@@ -35,3 +35,6 @@ def pressure(mbar):
 def temperature(x):
     return str(x).replace('-', '&minus;').replace('.', ',')
 
+
+def hour_minute(x):
+    return f'{x["hour"]}:{x["minute"]}'
