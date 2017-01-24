@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 
-import json
-from bottle import Bottle, request, run
+import json, os, sys
+from bottle import Bottle, static_file, run
 from house import weather
 from time import localtime
 from typing import Tuple
@@ -10,9 +10,16 @@ from typing import Tuple
 
 SPACE = '<span style="padding-left:1em;"></span>'
 AUTO_REFRESH_RATE = 300
+# STATIC_PATH  = os.path.join(sys.prefix, 'static')
 
 
 app = Bottle()
+
+
+# @app.get('/static/<filepath:path>')
+# def static_files(filepath):
+#     return static_file(filepath, root=STATIC_PATH)
+
 
 @app.get('/json/weather')
 def json_weather() -> str:
@@ -62,6 +69,13 @@ def pda() -> str:
     return f'''
         <meta http-equiv="refresh" content="{AUTO_REFRESH_RATE}">
         {weather_html}
+        <h3>
+            Данные о погоде предоставлены
+            <a href="https://wunderground.com">Weather Underground</a>
+            <a href="https://wunderground.com">
+                <img src="///icons.wxug.com/graphics/wu2/logo_130x80.png" style="height:0.8em; width:auto"/>
+            </a>
+        </h3>
     '''
 
 run(app, server='gunicorn', host='0.0.0.0', port=15134)
