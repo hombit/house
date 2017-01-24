@@ -1,44 +1,61 @@
 #!/usr/bin/env python3
 
 
+import json
 from bottle import Bottle, request, run
 from house import weather
 from time import localtime
+from typing import Tuple
 
 
-SPACE = "<span style='padding-left:1em;'></span>"
+SPACE = '<span style="padding-left:1em;"></span>'
+AUTO_REFRESH = '<meta http-equiv="refresh" content="300">'
 
 
 app = Bottle()
 
-json_weather = app.get('/weather')(weather.get_weather)
+@app.get('/json/weather')
+def json_weather() -> str:
+    return json.dumps(weather_strings(), ensure_ascii=False)
+
+
+def weather_strings() -> Tuple[str, ...]:
+    try:
+        jw = weather.get_weather()
+        w_now = jw['current_observation']
+
+        temp_now = weather.temperature(w_now['temp_c'])
+        wind_now = weather.wind(w_now['wind_kph'])
+        rel_hum_now = w_now['relative_humidity']
+        pres_now = weather.pressure(w_now['pressure_mb'])
+        cond_now = w_now['weather']
+        str_now = f'{cond_now}{SPACE} {temp_now}&nbsp;&deg;C{SPACE} {rel_hum_now}{SPACE} {wind_now}&nbsp;м/с{SPACE} {pres_now}&nbsp;бар'
+
+        if localtime().tm_hour < 19:
+            w_day = jw['forecast']['simpleforecast']['forecastday'][0]
+            day = 'Сегодня'
+        else:
+            w_day = jw['forecast']['simpleforecast']['forecastday'][1]
+            day = 'Завтра'
+        low_day = weather.temperature(w_day['low']['celsius'])
+        high_day = weather.temperature(w_day['high']['celsius'])
+        max_wind_day = weather.wind(w_day['maxwind']['kph'])
+        cond_day = w_day['conditions'].lower()
+        str_day = f'{day} {cond_day}, от {low_day}&nbsp;&deg;C до {high_day}&nbsp;&deg;C и ветер до {max_wind_day}&nbsp;м/с'
+    except KeyError:
+        return 'Информация о погоде недоступна',
+    except Exception as e:
+        return f'Exception of type {type(e)}: {e}',
+    return str_now, str_day
 
 
 @app.get('/pda')
-def pda():
-    jw = json_weather()
-    w_now = jw['current_observation']
-    if localtime().tm_hour < 19:
-        w_day = jw['forecast']['simpleforecast']['forecastday'][0]
-        day = 'Сегодня'
-    else:
-        w_day = jw['forecast']['simpleforecast']['forecastday'][1]
-        day = 'Завтра'
-
-    temp_now = weather.temperature(w_now['temp_c'])
-    wind_now = weather.wind(w_now['wind_kph'])
-    rel_hum_now = w_now['relative_humidity']
-    pres_now = weather.pressure(w_now['pressure_mb'])
-    cond_now = w_now['weather']
-
-    low_day = weather.temperature(w_day['low']['celsius'])
-    high_day = weather.temperature(w_day['high']['celsius'])
-    max_wind_day = weather.wind(w_day['maxwind']['kph'])
-    cond_day = w_day['conditions'].lower()
+def pda() -> str:
+    ws = weather_strings()
+    weather_html = '<h3>' + '</h3>\n<h3>'.join(ws) + '</h3>'
     return f'''
-        <meta http-equiv="refresh" content="300">
-        <h3>{cond_now}{SPACE} {temp_now}&nbsp;&deg;C{SPACE} {rel_hum_now}{SPACE} {wind_now}&nbsp;м/с{SPACE} {pres_now}&nbsp;бар</h3>
-        <h3>{day} {cond_day}, от {low_day}&nbsp;&deg;C до {high_day}&nbsp;&deg;C и ветер до {max_wind_day}&nbsp;м/с</h3>
+        {AUTO_REFRESH}
+        {weather_html}
     '''
 
 run(app, server='gunicorn', host='0.0.0.0', port=15134)
