@@ -80,17 +80,18 @@ def rasp_strings() -> Tuple[str, ...]:
 
 @app.get('/pda')
 def pda() -> str:
-    ws = weather_strings()
-    weather_html = '<h3>' + '</h3>\n<h3>'.join(ws) + '</h3>'
+    information = '<h3>' + '</h3>\n<h3>'.join(weather_strings() + rasp_strings()) + '</h3>'
     return f'''
         <meta http-equiv="refresh" content="{AUTO_REFRESH_RATE}">
-        {weather_html}
+        {information}
         <h3>
             Данные о погоде предоставлены
-            <a href="https://wunderground.com">Weather Underground</a>
             <a href="https://wunderground.com">
                 <img src="///icons.wxug.com/graphics/wu2/logo_130x80.png" style="height:0.8em; width:auto"/>
             </a>
+            <a href="https://wunderground.com">Weather Underground</a>.
+            Данные о расписании поездов предоставлены
+            <a href="https://rasp.yandex.ru">Яндекс.Расписаниями</a>
         </h3>
     '''
 
