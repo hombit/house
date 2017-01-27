@@ -34,7 +34,7 @@ def get_rasp(from_station='2001143',
         f'lang={lang}',
         *(f'date={date}' for date in dates),
         f'system={system}',
-        f'transport_type={transport_types}',
+        f'transport_types={transport_types}',
     )
     query = '?' + '&'.join(query_tuple)
     url = urljoin(_base_url, query)
