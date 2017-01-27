@@ -1,8 +1,8 @@
 import requests
 from urllib.parse import urljoin
-from .secrets import weather_underground_api_key
 from functools import reduce
 from cachetools.func import ttl_cache
+from .secrets import weather_underground_api_key
 
 
 _base_url = 'https://api.wunderground.com/api/'

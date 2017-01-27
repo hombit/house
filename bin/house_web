@@ -2,14 +2,15 @@
 
 
 import json, os, sys
-from bottle import Bottle, static_file, run
-from house import weather
+from bottle import Bottle, abort, static_file, run
+from house import weather, rasp
 from time import localtime
 from typing import Tuple
 
 
 SPACE = '<span style="padding-left:1em;"></span>'
-AUTO_REFRESH_RATE = 300
+AUTO_REFRESH_RATE = 15
+RUNTIME_TO_STATION = 900 - AUTO_REFRESH_RATE
 # STATIC_PATH  = os.path.join(sys.prefix, 'static')
 
 
@@ -21,9 +22,14 @@ app = Bottle()
 #     return static_file(filepath, root=STATIC_PATH)
 
 
-@app.get('/json/weather')
-def json_weather() -> str:
-    return json.dumps(weather_strings(), ensure_ascii=False)
+@app.get('/json/<page>')
+def json_(page) -> str:
+    try:
+        this_module = sys.modules[__name__]
+        page_strings = getattr(this_module, f'{page}_strings')()
+        return json.dumps(page_strings, ensure_ascii=False)
+    except AttributeError:
+        abort(404, 'No such page')
 
 
 def weather_strings() -> Tuple[str, ...]:
@@ -60,6 +66,16 @@ def weather_strings() -> Tuple[str, ...]:
     except Exception as e:
         return f'Exception of type {type(e)}: {e}',
     return str_now, str_astro, str_day
+
+
+def rasp_strings() -> Tuple[str, ...]:
+    try:
+        jr = rasp.get_rasp()
+    except KeyError:
+        return 'Информация о расписании недоступна',
+    except Exception as e:
+        return f'Exception of type {type(e)}: {e}',
+    return jr['threads'][0]['arrival'],
 
 
 @app.get('/pda')
