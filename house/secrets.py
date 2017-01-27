@@ -17,7 +17,7 @@ def _get_json():
         try:
             with open(filename, 'r') as fp:
                 return json.load(fp)
-        except FileNotFoundError:
+        except OSError:
             pass
     raise FileNotFoundError('Cannot find secrets.json file')
 

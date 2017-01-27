@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
 
-import json, os, sys
+import json, logging, os, sys
 from bottle import Bottle, abort, static_file, run
+from copy import deepcopy
 from house import weather, rasp
+from math import ceil
 from time import localtime
 from typing import Tuple
 
@@ -11,6 +13,8 @@ from typing import Tuple
 SPACE = '<span style="padding-left:1em;"></span>'
 AUTO_REFRESH_RATE = 15
 RUNTIME_TO_STATION = 900 - AUTO_REFRESH_RATE
+RASP_TIME_INTERVAL = 7200
+RASP_MIN_COUNT = 5
 # STATIC_PATH  = os.path.join(sys.prefix, 'static')
 
 
@@ -71,11 +75,19 @@ def weather_strings() -> Tuple[str, ...]:
 def rasp_strings() -> Tuple[str, ...]:
     try:
         jr = rasp.get_rasp()
+        rt_orig = rasp.RaspThreads(deepcopy(jr['threads']))
+        rt = deepcopy(rt_orig).after(RUNTIME_TO_STATION).before(RASP_TIME_INTERVAL)
+        if len(rt) < RASP_MIN_COUNT:
+            rt.extend(rt_orig.after(RASP_TIME_INTERVAL)[:RASP_MIN_COUNT-len(rt)])
+        threads = []
+        for x in rt:
+            hm = x['departure_datetime'].strftime('%H:%M')
+            minutes = ceil((x['departure_datetime'] - rt.now).seconds / 60)
+            threads.append(f'{hm}&nbsp;({minutes})')
+        str_threads = SPACE.join(threads)
+        return str_threads,
     except KeyError:
         return 'Информация о расписании недоступна',
-    except Exception as e:
-        return f'Exception of type {type(e)}: {e}',
-    return jr['threads'][0]['arrival'],
 
 
 @app.get('/pda')
@@ -95,5 +107,7 @@ def pda() -> str:
         </h3>
     '''
 
-run(app, server='gunicorn', host='0.0.0.0', port=15134)
+
+if __name__ == '__main__':
+    run(app, server='gunicorn', host='0.0.0.0', port=15134, debug=True)
 
