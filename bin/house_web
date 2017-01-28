@@ -2,7 +2,7 @@
 
 
 import json, logging, os, sys
-from bottle import Bottle, abort, static_file, run
+from bottle import Bottle, abort, redirect, run
 from copy import deepcopy
 from house import weather, rasp
 from math import ceil
@@ -21,12 +21,17 @@ RASP_MIN_COUNT = 4
 app = Bottle()
 
 
-# @app.get('/static/<filepath:path>')
+# @app.route('/static/<filepath:path>')
 # def static_files(filepath):
 #     return static_file(filepath, root=STATIC_PATH)
 
 
-@app.get('/json/<page>')
+@app.route('/')
+def index():
+    redirect('/pda')
+
+
+@app.route('/json/<page>')
 def json_(page) -> str:
     try:
         this_module = sys.modules[__name__]
@@ -84,19 +89,19 @@ def rasp_strings() -> Tuple[str, ...]:
             hm = x['departure_datetime'].strftime('%H:%M')
             minutes = ceil((x['departure_datetime'] - rt.now).seconds / 60)
             threads.append(f'{hm}&nbsp;({minutes})')
-        str_threads = SPACE.join(threads)
+        str_threads = f'{SPACE} '.join(threads)
         return str_threads,
     except KeyError:
         return 'Информация о расписании недоступна',
 
 
-@app.get('/pda')
+@app.route('/pda')
 def pda() -> str:
-    information = '<h3>' + '</h3>\n<h3>'.join(weather_strings() + rasp_strings()) + '</h3>'
+    information = '<h4>' + '</h4>\n<h4>'.join(weather_strings() + rasp_strings()) + '</h4>'
     return f'''
         <meta http-equiv="refresh" content="{AUTO_REFRESH_RATE}">
         {information}
-        <h3>
+        <h4>
             Данные о погоде предоставлены
             <a href="https://wunderground.com">
                 <img src="///icons.wxug.com/graphics/wu2/logo_130x80.png" style="height:0.8em; width:auto"/>
@@ -104,10 +109,10 @@ def pda() -> str:
             <a href="https://wunderground.com">Weather Underground</a>.
             Данные о расписании поездов предоставлены
             <a href="https://rasp.yandex.ru">Яндекс.Расписаниями</a>
-        </h3>
+        </h4>
     '''
 
 
 if __name__ == '__main__':
-    run(app, server='gunicorn', host='0.0.0.0', port=15134, debug=True)
+    run(app, server='gunicorn', host='0.0.0.0', port=15134)
 
