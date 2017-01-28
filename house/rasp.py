@@ -55,19 +55,18 @@ def get_rasp(from_station='2001143',
              lang='ru',
              system='express',
              transport_types='suburban',
-             dates=None):
-    if dates is None:
-        dates = (
-            _days_after_today(0),
-            _days_after_today(1)
-        )
+             date=None):
+    if date is None or date == 'today':
+        date = _days_after_today(0)
+    if date == 'tomorrow':
+        date = _days_after_today(1)
     query_tuple = (
         f'apikey={yandex_api_key}',
-        'format=json',
+         'format=json',
         f'from={from_station}',
         f'to={to_station}',
         f'lang={lang}',
-        *(f'date={date}' for date in dates),
+        f'date={date}',
         f'system={system}',
         f'transport_types={transport_types}',
     )

@@ -14,7 +14,7 @@ SPACE = '<span style="padding-left:1em;"></span>'
 AUTO_REFRESH_RATE = 15
 RUNTIME_TO_STATION = 900 - AUTO_REFRESH_RATE
 RASP_TIME_INTERVAL = 7200
-RASP_MIN_COUNT = 5
+RASP_MIN_COUNT = 4
 # STATIC_PATH  = os.path.join(sys.prefix, 'static')
 
 
