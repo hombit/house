@@ -57,7 +57,7 @@ def weather_strings() -> Tuple[str, ...]:
         moon_phase = w_astro['phaseofMoon']
         sunrise = weather.hour_minute(w_astro['sunrise'])
         sunset = weather.hour_minute(w_astro['sunset'])
-        str_astro = f'{moon_phase}, Солнце на небе c {sunrise} до {sunset}'
+        str_astro = f'{moon_phase}. Солнце на небе c {sunrise} до {sunset}'
 
         if localtime().tm_hour < 19:
             w_day = jw['forecast']['simpleforecast']['forecastday'][0]
@@ -107,8 +107,9 @@ def pda() -> str:
                 <img src="///icons.wxug.com/graphics/wu2/logo_130x80.png" style="height:0.8em; width:auto"/>
             </a>
             <a href="https://wunderground.com">Weather Underground</a>.
-            Данные о расписании поездов предоставлены
-            <a href="https://rasp.yandex.ru">Яндекс.Расписаниями</a>
+            Данные о расписании поездов предоставлены сервисом
+            <a href="https://rasp.yandex.ru">Яндекс.Расписания</a>.
+            Исходный код доступен на <a href="https://github.com/hombit/house">ГитХабе</a>
         </h4>
     '''
 
