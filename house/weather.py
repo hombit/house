@@ -13,7 +13,7 @@ _base_url = 'https://api.wunderground.com/api/'
 def get_weather(
     location: str = 'Russia/Moscow',
     lang: str = 'RU',
-    features: Tuple[str, ...] = ('conditions','forecast','astronomy')
+    features: Tuple[str, ...] = ('conditions', 'forecast', 'astronomy')
 ) -> dict:
     url_parts = (
         f'{weather_underground_api_key}/',
@@ -34,9 +34,9 @@ def wind(mph: SupportsFloat) -> str:
 def wind_dir(s: str, nesw: str = 'СВЮЗ') -> str:
     if len(s) > 3:
         s = s[0]
-    pairs = ((eng, nesw[i]) for i,eng in enumerate('NESW'))
+    pairs = ((eng, nesw[i]) for i, eng in enumerate('NESW'))
     s = reduce(
-        lambda s, pair: str.replace(s, *pair),
+        lambda x, pair: str.replace(x, *pair),
         pairs,
         s
     )
