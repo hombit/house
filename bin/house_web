@@ -33,7 +33,7 @@ def index():
 
 @app.route('/robots.txt')
 def robots_txt():
-    return 'Disallow: /json'
+    return 'Disallow: /json/'
 
 
 @app.route('/json/<page>')
