@@ -28,6 +28,16 @@ def wind(mph):
     return '{:.1f}'.format(float(mph) / 3.6).replace('.', ',')
 
 
+def wind_dir(s, NESW='СВЮЗ'):
+    pairs = ((eng, NESW[i]) for i,eng in enumerate('NESW'))
+    s = reduce(
+        lambda s, pair: str.replace(s, *pair),
+        pairs,
+        s
+    )
+    return s
+
+
 def pressure(mbar):
     return '{:.3f}'.format(float(mbar) / 1000).replace('.', ',')
 

@@ -47,11 +47,13 @@ def weather_strings() -> Tuple[str, ...]:
         w_now = jw['current_observation']
 
         temp_now = weather.temperature(w_now['temp_c'])
+        temp_feels_now = weather.temperature(w_now['feelslike_c'])
         wind_now = weather.wind(w_now['wind_kph'])
+        wind_dir_now = weather.wind_dir(w_now['wind_dir'])
         rel_hum_now = w_now['relative_humidity']
         pres_now = weather.pressure(w_now['pressure_mb'])
-        cond_now = w_now['weather']
-        str_now = f'{cond_now}{SPACE} {temp_now}&nbsp;&deg;C{SPACE} {rel_hum_now}{SPACE} {wind_now}&nbsp;м/с{SPACE} {pres_now}&nbsp;бар'
+        # cond_now = w_now['weather']
+        str_now = f'{temp_now}&nbsp;&deg;C&nbsp;({temp_feels_now}&nbsp;&deg;C){SPACE} {rel_hum_now}{SPACE} {wind_dir_now}&nbsp;{wind_now}&nbsp;м/с{SPACE} {pres_now}&nbsp;бар'
 
         w_astro = jw['moon_phase']
         moon_phase = w_astro['phaseofMoon']
@@ -68,8 +70,9 @@ def weather_strings() -> Tuple[str, ...]:
         low_day = weather.temperature(w_day['low']['celsius'])
         high_day = weather.temperature(w_day['high']['celsius'])
         max_wind_day = weather.wind(w_day['maxwind']['kph'])
+        max_wind_dir_day = weather.wind_dir(w_day['maxwind']['dir'])
         cond_day = w_day['conditions'].lower()
-        str_day = f'{day} {cond_day}, от {low_day}&nbsp;&deg;C до {high_day}&nbsp;&deg;C и ветер до {max_wind_day}&nbsp;м/с'
+        str_day = f'{day} {cond_day}, от {low_day}&nbsp;&deg;C до {high_day}&nbsp;&deg;C и {max_wind_dir_day} ветер до {max_wind_day}&nbsp;м/с'
     except KeyError:
         return 'Информация о погоде недоступна',
     except Exception as e:
