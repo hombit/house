@@ -29,6 +29,8 @@ def wind(mph):
 
 
 def wind_dir(s, NESW='СВЮЗ'):
+    if len(s) > 3:
+        s = s[0]
     pairs = ((eng, NESW[i]) for i,eng in enumerate('NESW'))
     s = reduce(
         lambda s, pair: str.replace(s, *pair),
