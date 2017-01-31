@@ -31,6 +31,11 @@ def index():
     redirect('/pda')
 
 
+@app.route('/robots.txt')
+def robots_txt():
+    return 'Disallow: /json'
+
+
 @app.route('/json/<page>')
 def json_(page) -> str:
     try:
