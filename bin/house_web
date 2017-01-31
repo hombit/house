@@ -27,17 +27,17 @@ app = Bottle()
 
 
 @app.route('/')
-def index():
+def index() -> None:
     redirect('/pda')
 
 
 @app.route('/robots.txt')
-def robots_txt():
+def robots_txt() -> str:
     return 'Disallow: /json/'
 
 
 @app.route('/json/<page>')
-def json_(page) -> str:
+def json_(page: str) -> str:
     try:
         this_module = sys.modules[__name__]
         page_strings = getattr(this_module, f'{page}_strings')()

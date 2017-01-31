@@ -2,6 +2,7 @@ import requests
 from urllib.parse import urljoin
 from functools import reduce
 from cachetools.func import ttl_cache
+from typing import SupportsFloat, Tuple, Union
 from .secrets import weather_underground_api_key
 
 
@@ -9,9 +10,11 @@ _base_url = 'https://api.wunderground.com/api/'
 
 
 @ttl_cache(500, ttl=720)
-def get_weather(location='Russia/Moscow',
-                lang='RU',
-                features=('conditions','forecast','astronomy')):
+def get_weather(
+    location: str = 'Russia/Moscow',
+    lang: str = 'RU',
+    features: Tuple[str, ...] = ('conditions','forecast','astronomy')
+) -> dict:
     url_parts = (
         f'{weather_underground_api_key}/',
         *(f'{f}/' for f in features),
@@ -24,14 +27,14 @@ def get_weather(location='Russia/Moscow',
     return r.json()
 
 
-def wind(mph):
+def wind(mph: SupportsFloat) -> str:
     return '{:.1f}'.format(float(mph) / 3.6).replace('.', ',')
 
 
-def wind_dir(s, NESW='СВЮЗ'):
+def wind_dir(s: str, nesw: str = 'СВЮЗ') -> str:
     if len(s) > 3:
         s = s[0]
-    pairs = ((eng, NESW[i]) for i,eng in enumerate('NESW'))
+    pairs = ((eng, nesw[i]) for i,eng in enumerate('NESW'))
     s = reduce(
         lambda s, pair: str.replace(s, *pair),
         pairs,
@@ -40,13 +43,13 @@ def wind_dir(s, NESW='СВЮЗ'):
     return s
 
 
-def pressure(mbar):
+def pressure(mbar: SupportsFloat) -> str:
     return '{:.3f}'.format(float(mbar) / 1000).replace('.', ',')
 
 
-def temperature(x):
+def temperature(x: Union[int, float]) -> str:
     return str(x).replace('-', '&minus;').replace('.', ',')
 
 
-def hour_minute(x):
+def hour_minute(x: dict) -> str:
     return f'{x["hour"]}:{x["minute"]}'

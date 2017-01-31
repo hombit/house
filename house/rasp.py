@@ -4,20 +4,24 @@ import requests
 from cachetools.func import ttl_cache
 from collections import UserList
 from operator import lt, ge
+from typing import Any, Callable, Optional, TypeVar, Union
 from urllib.parse import urljoin
 from .secrets import yandex_api_key
+
+
+T = TypeVar('T')
 
 
 _base_url = 'https://api.rasp.yandex.net/v1.0/search/'
 
 
-def _days_after_today(x=0):
+def _days_after_today(x: int = 0) -> str:
     today = datetime.date.today()
     day = today + datetime.timedelta(days=x)
     return day.strftime('%Y-%m-%d')
 
 
-def _datetime_fromstring(s):
+def _datetime_fromstring(s: str) -> datetime.datetime:
     return datetime.datetime.strptime(s, '%Y-%m-%d %H:%M:%S')
 
 
@@ -34,7 +38,9 @@ class RaspThreads(UserList):
     def now(self):
         return copy.copy(self._now)
 
-    def _filter_before_after(self, operator, seconds_from_now):
+    def _filter_before_after(self: T,
+                             operator: Callable[[Any, Any], bool],
+                             seconds_from_now: Union[int, float]) -> T:
         t = self._now + datetime.timedelta(seconds=seconds_from_now)
         self.data = list(filter(
             lambda x: operator(x['departure_datetime'], t),
@@ -42,20 +48,20 @@ class RaspThreads(UserList):
         ))
         return self
 
-    def after(self, *args, **kwargs):
+    def after(self: T, *args, **kwargs) -> T:
         return self._filter_before_after(ge, *args, **kwargs)
 
-    def before(self, *args, **kwargs):
+    def before(self: T, *args, **kwargs) -> T:
         return self._filter_before_after(lt, *args, **kwargs)
 
 
 @ttl_cache(50, ttl=900)
-def get_rasp(from_station='2001143',
-             to_station='2000007',
-             lang='ru',
-             system='express',
-             transport_types='suburban',
-             date=None):
+def get_rasp(from_station: str = '2001143',
+             to_station: str = '2000007',
+             lang: str = 'ru',
+             system: str = 'express',
+             transport_types: str = 'suburban',
+             date: Optional[str] = None) -> dict:
     if date is None or date == 'today':
         date = _days_after_today(0)
     if date == 'tomorrow':
