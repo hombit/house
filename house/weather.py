@@ -43,11 +43,15 @@ def wind_dir(s: str, nesw: str = 'СВЮЗ') -> str:
     return s
 
 
+def precipitation(x: Union[int, float, str]) -> str:
+    return str(x).replace('.', ',')
+
+
 def pressure(mbar: SupportsFloat) -> str:
     return '{:.3f}'.format(float(mbar) / 1000).replace('.', ',')
 
 
-def temperature(x: Union[int, float]) -> str:
+def temperature(x: Union[int, float, str]) -> str:
     return str(x).replace('-', '&minus;').replace('.', ',')
 
 
