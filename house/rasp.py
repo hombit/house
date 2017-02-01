@@ -26,7 +26,7 @@ def _datetime_fromstring(s: str) -> datetime.datetime:
 
 
 class RaspThreads(UserList):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         for x in self:
             for key in ('arrival', 'departure'):
@@ -35,7 +35,7 @@ class RaspThreads(UserList):
         self._now = datetime.datetime.now()
 
     @property
-    def now(self):
+    def now(self) -> datetime.datetime:
         return copy.copy(self._now)
 
     def _filter_before_after(self: T,
