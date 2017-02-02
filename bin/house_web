@@ -97,7 +97,8 @@ def rasp_strings() -> Tuple[str, ...]:
         for x in rt:
             hm = x['departure_datetime'].strftime('%H:%M')
             minutes = ceil((x['departure_datetime'] - rt.now).seconds / 60)
-            threads.append(f'{hm}&nbsp;({minutes})')
+            title = x['thread']['title'][0]
+            threads.append(f'{title}&nbsp;{hm}&nbsp;({minutes})')
         str_threads = f'{SPACE} '.join(threads)
         return str_threads,
     except KeyError:
