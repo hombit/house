@@ -1,12 +1,11 @@
 import copy
 import datetime
 import requests
-from cachetools.func import ttl_cache
 from collections import UserList
 from operator import lt, ge
 from typing import Any, Callable, Optional, TypeVar, Union
 from urllib.parse import urljoin
-from .config import rasp as cfg
+from .tools import ApiBasic
 from .secrets import yandex_api_key
 
 
@@ -56,28 +55,29 @@ class RaspThreads(UserList):
         return self._filter_before_after(lt, *args, **kwargs)
 
 
-@ttl_cache(cfg['cache_size'], ttl=cfg['cache_ttl'])
-def get_rasp(from_station: str = cfg['from_station'],
-             to_station: str = cfg['to_station'],
-             lang: str = cfg['lang'],
-             system: str = cfg['express'],
-             transport_types: str = cfg['transport_types'],
+class Rasp(ApiBasic):
+    @staticmethod
+    def _get(from_station: str,
+             to_station: str,
+             lang: str,
+             system: str,
+             transport_types: str,
              date: Optional[str] = None) -> dict:
-    if date is None or date == 'today':
-        date = _days_after_today(0)
-    if date == 'tomorrow':
-        date = _days_after_today(1)
-    query_tuple = (
-        f'apikey={yandex_api_key}',
-         'format=json',
-        f'from={from_station}',
-        f'to={to_station}',
-        f'lang={lang}',
-        f'date={date}',
-        f'system={system}',
-        f'transport_types={transport_types}',
-    )
-    query = '?' + '&'.join(query_tuple)
-    url = urljoin(_base_url, query)
-    r = requests.get(url)
-    return r.json()
+        if date is None or date == 'today':
+            date = _days_after_today(0)
+        if date == 'tomorrow':
+            date = _days_after_today(1)
+        query_tuple = (
+            f'apikey={yandex_api_key}',
+             'format=json',
+            f'from={from_station}',
+            f'to={to_station}',
+            f'lang={lang}',
+            f'date={date}',
+            f'system={system}',
+            f'transport_types={transport_types}',
+        )
+        query = '?' + '&'.join(query_tuple)
+        url = urljoin(_base_url, query)
+        r = requests.get(url)
+        return r.json()

@@ -1,31 +1,32 @@
 import requests
 from urllib.parse import urljoin
 from functools import reduce
-from cachetools.func import ttl_cache
-from typing import SupportsFloat, Tuple, Union
-from .config import weather as cfg
+from typing import Optional, SupportsFloat, Tuple, Union
 from .secrets import weather_underground_api_key
+from .tools import ApiBasic
 
 
 _base_url = 'https://api.wunderground.com/api/'
 
 
-@ttl_cache(cfg['cache_size'], ttl=cfg['cache_ttl'])
-def get_weather(
-    location: str = cfg['location'],
-    lang: str = cfg['lang'],
-    features: Tuple[str, ...] = ('conditions', 'forecast', 'astronomy')
-) -> dict:
-    url_parts = (
-        f'{weather_underground_api_key}/',
-        *(f'{f}/' for f in features),
-        f'lang%3A{lang}/',
-        'q/',
-        f'{location}.json'
-    )
-    url = reduce(urljoin, url_parts, _base_url)
-    r = requests.get(url)
-    return r.json()
+class Weather(ApiBasic):
+    @staticmethod
+    def _get(location: str,
+            lang: Optional[str],
+            features: Tuple[str, ...] = ('conditions', 'forecast', 'astronomy')
+        ) -> dict:
+        if lang is None:
+            lang = 'EN'
+        url_parts = (
+            f'{weather_underground_api_key}/',
+            *(f'{f}/' for f in features),
+            f'lang%3A{lang}/',
+            'q/',
+            f'{location}.json'
+        )
+        url = reduce(urljoin, url_parts, _base_url)
+        r = requests.get(url)
+        return r.json()
 
 
 def wind(mph: SupportsFloat) -> str:

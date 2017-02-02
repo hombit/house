@@ -1,11 +1,11 @@
 import json, os, sys
 
 
-CONFIG_FILE_PATH = os.path.join(sys.prefix, 'house/config/config.json')
+CONFIG_FILE_PATH = os.path.join(sys.prefix, 'house/config/house.json')
 
 
 with open(CONFIG_FILE_PATH, 'r') as fd:
-    config = json.loads(fd)
+    config = json.load(fd)
 
 __module = sys.modules[__name__]
 

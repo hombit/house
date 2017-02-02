@@ -17,9 +17,7 @@
     "transport_types": "suburban",
     "system": "express",
     "from_station": "2001143",
-    "from_station_name": "Мичуринец",
     "to_station": "2000007",
-    "to_station_name": "Москва Киевская",
     "lang": "ru"
   }
 }
