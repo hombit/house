@@ -3,16 +3,17 @@ from urllib.parse import urljoin
 from functools import reduce
 from cachetools.func import ttl_cache
 from typing import SupportsFloat, Tuple, Union
+from .config import weather as cfg
 from .secrets import weather_underground_api_key
 
 
 _base_url = 'https://api.wunderground.com/api/'
 
 
-@ttl_cache(500, ttl=720)
+@ttl_cache(cfg['cache_size'], ttl=cfg['cache_ttl'])
 def get_weather(
-    location: str = 'Russia/Moscow',
-    lang: str = 'RU',
+    location: str = cfg['location'],
+    lang: str = cfg['lang'],
     features: Tuple[str, ...] = ('conditions', 'forecast', 'astronomy')
 ) -> dict:
     url_parts = (

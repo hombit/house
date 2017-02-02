@@ -4,7 +4,7 @@
 import json, logging, os, sys
 from bottle import Bottle, abort, redirect, run
 from copy import deepcopy
-from house import weather, rasp
+from house import config, weather, rasp
 from math import ceil
 from time import localtime
 from typing import Tuple

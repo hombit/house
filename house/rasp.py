@@ -6,6 +6,7 @@ from collections import UserList
 from operator import lt, ge
 from typing import Any, Callable, Optional, TypeVar, Union
 from urllib.parse import urljoin
+from .config import rasp as cfg
 from .secrets import yandex_api_key
 
 
@@ -55,12 +56,12 @@ class RaspThreads(UserList):
         return self._filter_before_after(lt, *args, **kwargs)
 
 
-@ttl_cache(50, ttl=900)
-def get_rasp(from_station: str = '2001143',
-             to_station: str = '2000007',
-             lang: str = 'ru',
-             system: str = 'express',
-             transport_types: str = 'suburban',
+@ttl_cache(cfg['cache_size'], ttl=cfg['cache_ttl'])
+def get_rasp(from_station: str = cfg['from_station'],
+             to_station: str = cfg['to_station'],
+             lang: str = cfg['lang'],
+             system: str = cfg['express'],
+             transport_types: str = cfg['transport_types'],
              date: Optional[str] = None) -> dict:
     if date is None or date == 'today':
         date = _days_after_today(0)
