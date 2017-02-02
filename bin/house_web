@@ -1,29 +1,13 @@
 #!/usr/bin/env python3
 
 
-import json, logging, os, sys
+import json
 from bottle import Bottle, abort, redirect, run
-from copy import deepcopy
-from house import config, weather, rasp
-from math import ceil
-from time import localtime
-from typing import Tuple
-
-
-SPACE = '<span style="padding-left:1em;"></span>'
-AUTO_REFRESH_RATE = 15
-RUNTIME_TO_STATION = 900 - AUTO_REFRESH_RATE
-RASP_TIME_INTERVAL = 7200
-RASP_MIN_COUNT = 4
-# STATIC_PATH  = os.path.join(sys.prefix, 'static')
+from house import webview
 
 
 app = Bottle()
-
-
-# @app.route('/static/<filepath:path>')
-# def static_files(filepath):
-#     return static_file(filepath, root=STATIC_PATH)
+HTML_STRINGS = webview.HTMLStrings()
 
 
 @app.route('/')
@@ -39,79 +23,17 @@ def robots_txt() -> str:
 @app.route('/json/<page>')
 def json_(page: str) -> str:
     try:
-        this_module = sys.modules[__name__]
-        page_strings = getattr(this_module, f'{page}_strings')()
+        page_strings = getattr(HTML_STRINGS, f'{page}_strings')()
         return json.dumps(page_strings, ensure_ascii=False)
     except AttributeError:
         abort(404, 'No such page')
 
 
-def weather_strings() -> Tuple[str, ...]:
-    try:
-        w = weather.Weather(**config.config['weather'])
-        jw = w()
-        w_now = jw['current_observation']
-
-        temp_now = weather.temperature(w_now['temp_c'])
-        temp_feels_now = weather.temperature(w_now['feelslike_c'])
-        wind_now = weather.wind(w_now['wind_kph'])
-        wind_dir_now = weather.wind_dir(w_now['wind_dir'])
-        rel_hum_now = w_now['relative_humidity']
-        pres_now = weather.pressure(w_now['pressure_mb'])
-        cond_now = w_now['weather']
-        str_now = f'{cond_now}{SPACE} {temp_now}&nbsp;&deg;C&nbsp;({temp_feels_now}&nbsp;&deg;C){SPACE} {rel_hum_now}{SPACE} {wind_dir_now}&nbsp;{wind_now}&nbsp;м/с{SPACE} {pres_now}&nbsp;бар'
-
-        w_astro = jw['moon_phase']
-        moon_phase = w_astro['phaseofMoon']
-        sunrise = weather.hour_minute(w_astro['sunrise'])
-        sunset = weather.hour_minute(w_astro['sunset'])
-        str_astro = f'{moon_phase}. Солнце на небе c {sunrise} до {sunset}'
-
-        if localtime().tm_hour < 19:
-            w_day = jw['forecast']['simpleforecast']['forecastday'][0]
-            day = 'Сегодня'
-        else:
-            w_day = jw['forecast']['simpleforecast']['forecastday'][1]
-            day = 'Завтра'
-        low_day = weather.temperature(w_day['low']['celsius'])
-        high_day = weather.temperature(w_day['high']['celsius'])
-        max_wind_day = weather.wind(w_day['maxwind']['kph'])
-        max_wind_dir_day = weather.wind_dir(w_day['maxwind']['dir'])
-        qpf_day = weather.precipitation(w_day['qpf_allday']['mm'])
-        cond_day = w_day['conditions'].lower()
-        str_day = f'{day} {cond_day}, {qpf_day}&nbsp;мм, от {low_day}&nbsp;&deg;C до {high_day}&nbsp;&deg;C и {max_wind_dir_day} ветер до {max_wind_day}&nbsp;м/с'
-    except KeyError:
-        return 'Информация о погоде недоступна',
-    except Exception as e:
-        return f'Exception of type {type(e)}: {e}',
-    return str_now, str_astro, str_day
-
-
-def rasp_strings() -> Tuple[str, ...]:
-    try:
-        r = rasp.Rasp(**config.config['rasp'])
-        jr = r()
-        rt_orig = rasp.RaspThreads(deepcopy(jr['threads']))
-        rt = deepcopy(rt_orig).after(RUNTIME_TO_STATION).before(RASP_TIME_INTERVAL)
-        if len(rt) < RASP_MIN_COUNT:
-            rt.extend(rt_orig.after(RASP_TIME_INTERVAL)[:RASP_MIN_COUNT-len(rt)])
-        threads = []
-        for x in rt:
-            hm = x['departure_datetime'].strftime('%H:%M')
-            minutes = ceil((x['departure_datetime'] - rt.now).seconds / 60)
-            title = x['thread']['title'][0]
-            threads.append(f'{title}&nbsp;{hm}&nbsp;({minutes})')
-        str_threads = f'{SPACE} '.join(threads)
-        return str_threads,
-    except KeyError:
-        return 'Информация о расписании недоступна',
-
-
 @app.route('/pda')
 def pda() -> str:
-    information = '<h4>' + '</h4>\n<h4>'.join(weather_strings() + rasp_strings()) + '</h4>'
+    information = '<h4>' + '</h4>\n<h4>'.join(HTML_STRINGS.weather_strings() + HTML_STRINGS.rasp_strings()) + '</h4>'
     return f'''
-        <meta http-equiv="refresh" content="{AUTO_REFRESH_RATE}">
+        <meta http-equiv="refresh" content="{HTML_STRINGS.auto_refresh_rate}">
         {information}
         <h4>
             Данные о погоде предоставлены
