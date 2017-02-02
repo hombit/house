@@ -5,6 +5,7 @@ setup(
     version='',
     packages=['house'],
     scripts=['bin/house_web'],
+    data_files=[('house/config', ['house.json'])],
     url='http://home.homb.it',
     license='',
     author='Konstantin Malanchev',

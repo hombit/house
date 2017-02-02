@@ -1,11 +1,11 @@
 import copy
 import datetime
 import requests
-from cachetools.func import ttl_cache
 from collections import UserList
 from operator import lt, ge
 from typing import Any, Callable, Optional, TypeVar, Union
 from urllib.parse import urljoin
+from .tools import ApiBasic
 from .secrets import yandex_api_key
 
 
@@ -55,28 +55,29 @@ class RaspThreads(UserList):
         return self._filter_before_after(lt, *args, **kwargs)
 
 
-@ttl_cache(50, ttl=900)
-def get_rasp(from_station: str = '2001143',
-             to_station: str = '2000007',
-             lang: str = 'ru',
-             system: str = 'express',
-             transport_types: str = 'suburban',
+class Rasp(ApiBasic):
+    @staticmethod
+    def _get(from_station: str,
+             to_station: str,
+             lang: str,
+             system: str,
+             transport_types: str,
              date: Optional[str] = None) -> dict:
-    if date is None or date == 'today':
-        date = _days_after_today(0)
-    if date == 'tomorrow':
-        date = _days_after_today(1)
-    query_tuple = (
-        f'apikey={yandex_api_key}',
-         'format=json',
-        f'from={from_station}',
-        f'to={to_station}',
-        f'lang={lang}',
-        f'date={date}',
-        f'system={system}',
-        f'transport_types={transport_types}',
-    )
-    query = '?' + '&'.join(query_tuple)
-    url = urljoin(_base_url, query)
-    r = requests.get(url)
-    return r.json()
+        if date is None or date == 'today':
+            date = _days_after_today(0)
+        if date == 'tomorrow':
+            date = _days_after_today(1)
+        query_tuple = (
+            f'apikey={yandex_api_key}',
+             'format=json',
+            f'from={from_station}',
+            f'to={to_station}',
+            f'lang={lang}',
+            f'date={date}',
+            f'system={system}',
+            f'transport_types={transport_types}',
+        )
+        query = '?' + '&'.join(query_tuple)
+        url = urljoin(_base_url, query)
+        r = requests.get(url)
+        return r.json()

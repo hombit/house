@@ -4,7 +4,7 @@
 import json, logging, os, sys
 from bottle import Bottle, abort, redirect, run
 from copy import deepcopy
-from house import weather, rasp
+from house import config, weather, rasp
 from math import ceil
 from time import localtime
 from typing import Tuple
@@ -48,7 +48,8 @@ def json_(page: str) -> str:
 
 def weather_strings() -> Tuple[str, ...]:
     try:
-        jw = weather.get_weather()
+        w = weather.Weather(**config.config['weather'])
+        jw = w()
         w_now = jw['current_observation']
 
         temp_now = weather.temperature(w_now['temp_c'])
@@ -88,7 +89,8 @@ def weather_strings() -> Tuple[str, ...]:
 
 def rasp_strings() -> Tuple[str, ...]:
     try:
-        jr = rasp.get_rasp()
+        r = rasp.Rasp(**config.config['rasp'])
+        jr = r()
         rt_orig = rasp.RaspThreads(deepcopy(jr['threads']))
         rt = deepcopy(rt_orig).after(RUNTIME_TO_STATION).before(RASP_TIME_INTERVAL)
         if len(rt) < RASP_MIN_COUNT:
