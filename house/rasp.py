@@ -123,14 +123,17 @@ class Rasp(ApiBasic):
                 kwargs[k] = self._call_kwargs[k]
         return self.get_thread_info(**kwargs)
 
-    def time_of_stop_at(self,
+    def have_a_stop_at(self,
                        thread_uid: str,
-                       date: Optional[str] = None) -> Optional[str]:
+                       date: Optional[str] = None) -> bool:
         system = self._call_kwargs['system']
         stop_station = self._call_kwargs['stop_station']
         stops = self.thread_info(thread_uid, date)['stops']
         for stop in stops:
-            if stop['station']['codes'][system] == stop_station:
-                time = stop['station']['arrival'] or stop['station']['departure']
-                return time
-        return None
+            st = stop['station']
+            if 'codes' not in st:  # Work around bug in Yandex.Rasp API
+                continue
+            if st['codes'][system] == stop_station:
+                stop_time = stop['stop_time'] or 0
+                return int(stop_time) > 0
+        return False

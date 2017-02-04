@@ -3,7 +3,7 @@
     "auto_refresh_rate": 15,
     "runtime_to_station": 900,
     "rasp_time_interval": 7200,
-    "rasp_min_count": 4
+    "rasp_min_count": 6
   },
   "weather": {
     "cache_size": 50,

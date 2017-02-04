@@ -66,8 +66,10 @@ class HTMLStrings:
                 hm = x['departure_datetime'].strftime('%H:%M')
                 minutes = ceil((x['departure_datetime'] - rt.now).seconds / 60)
                 title = x['thread']['title'][0]
+                if not self.r.have_a_stop_at(x['thread']['uid']):
+                    hm = f'<i>{hm}</i>'
                 threads.append(f'{title}&nbsp;{hm}&nbsp;({minutes})')
             str_threads = f'{self.SPACE} '.join(threads)
             return str_threads,
-        except KeyError:
-            return 'Информация о расписании недоступна',
+        except KeyError as e:
+            return f'Информация о расписании недоступна {e}',
