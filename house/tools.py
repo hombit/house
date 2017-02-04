@@ -6,7 +6,8 @@ class ApiBasic:
         self._cache_size = cache_size
         self._cache_ttl = cache_ttl
         self._call_kwargs = kwargs
-        self.get = ttl_cache(maxsize=cache_size, ttl=cache_ttl)(self._get)
+        self._cache_decorator = ttl_cache(maxsize=cache_size, ttl=cache_ttl)
+        self.get = self._cache_decorator(self._get)
 
     def __call__(self, *args, **kwargs) -> dict:
         kwargs.update(self._call_kwargs)

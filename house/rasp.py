@@ -2,6 +2,7 @@ import copy
 import datetime
 import requests
 from collections import UserList
+from inspect import getfullargspec
 from operator import lt, ge
 from typing import Any, Callable, Optional, TypeVar, Union
 from urllib.parse import urljoin
@@ -12,7 +13,11 @@ from .secrets import yandex_api_key
 T = TypeVar('T')
 
 
-_base_url = 'https://api.rasp.yandex.net/v1.0/search/'
+_base_url = 'https://api.rasp.yandex.net/v1.0/'
+
+
+_base_query_tuple = (f'apikey={yandex_api_key}',
+                     'format=json',)
 
 
 def _days_after_today(x: int = 0) -> str:
@@ -23,6 +28,14 @@ def _days_after_today(x: int = 0) -> str:
 
 def _datetime_fromstring(s: str) -> datetime.datetime:
     return datetime.datetime.strptime(s, '%Y-%m-%d %H:%M:%S')
+
+
+def _optional_date_conversation(date: str) -> str:
+    if date is None or date == 'today':
+        return _days_after_today(0)
+    if date == 'tomorrow':
+        return _days_after_today(1)
+    return date
 
 
 class RaspThreads(UserList):
@@ -56,6 +69,10 @@ class RaspThreads(UserList):
 
 
 class Rasp(ApiBasic):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.get_stops = self._cache_decorator(self._get_stops)
+
     @staticmethod
     def _get(from_station: str,
              to_station: str,
@@ -63,13 +80,8 @@ class Rasp(ApiBasic):
              system: str,
              transport_types: str,
              date: Optional[str] = None) -> dict:
-        if date is None or date == 'today':
-            date = _days_after_today(0)
-        if date == 'tomorrow':
-            date = _days_after_today(1)
-        query_tuple = (
-            f'apikey={yandex_api_key}',
-             'format=json',
+        date = _optional_date_conversation(date)
+        query_tuple = _base_query_tuple + (
             f'from={from_station}',
             f'to={to_station}',
             f'lang={lang}',
@@ -78,6 +90,34 @@ class Rasp(ApiBasic):
             f'transport_types={transport_types}',
         )
         query = '?' + '&'.join(query_tuple)
-        url = urljoin(_base_url, query)
+        search_url = urljoin(_base_url, 'search/')
+        url = urljoin(search_url, query)
         r = requests.get(url)
         return r.json()
+
+    @staticmethod
+    def _get_stops(thread_uid: str,
+                   lang: str,
+                   system: str,
+                   date: Optional[str] = None) -> dict:
+        date = _optional_date_conversation(date)
+        query_tuple = _base_query_tuple + (
+            f'uid={thread_uid}',
+            f'lang={lang}',
+            f'date={date}',
+            f'show_systems={system}',
+        )
+        query = '?' + '&'.join(query_tuple)
+        stops_url = urljoin(_base_url, 'thread/')
+        url = urljoin(stops_url, query)
+        r = requests.get(url)
+        return r.json()
+
+    def stops(self,
+              thread_uid: str,
+              date: Optional[str] = None) -> dict:
+        kwargs = {'thread_uid':thread_uid, 'date':date}
+        for k in getfullargspec(self._get_stops).args:
+            if k not in kwargs:
+                kwargs[k] = self._call_kwargs[k]
+        return self.get_stops(**kwargs)
