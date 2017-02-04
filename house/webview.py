@@ -66,9 +66,10 @@ class HTMLStrings:
                 hm = x['departure_datetime'].strftime('%H:%M')
                 minutes = ceil((x['departure_datetime'] - rt.now).seconds / 60)
                 title = x['thread']['title'][0]
+                thread = f'{title}&nbsp;{hm}&nbsp;({minutes})'
                 if not self.r.have_a_stop_at(x['thread']['uid']):
-                    hm = f'<i>{hm}</i>'
-                threads.append(f'{title}&nbsp;{hm}&nbsp;({minutes})')
+                    thread = f'<i>{thread}</i>'
+                threads.append(thread)
             str_threads = f'{self.SPACE} '.join(threads)
             return str_threads,
         except KeyError as e:
