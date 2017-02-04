@@ -18,6 +18,7 @@
     "system": "express",
     "from_station": "2001143",
     "to_station": "2000007",
+    "stop_station": "2001069",
     "lang": "ru"
   }
 }

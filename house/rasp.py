@@ -71,7 +71,7 @@ class RaspThreads(UserList):
 class Rasp(ApiBasic):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.get_stops = self._cache_decorator(self._get_stops)
+        self.get_thread_info = self._cache_decorator(self._get_thread_info)
 
     @staticmethod
     def _get(from_station: str,
@@ -79,7 +79,8 @@ class Rasp(ApiBasic):
              lang: str,
              system: str,
              transport_types: str,
-             date: Optional[str] = None) -> dict:
+             date: Optional[str] = None,
+             **kwargs) -> dict:
         date = _optional_date_conversation(date)
         query_tuple = _base_query_tuple + (
             f'from={from_station}',
@@ -96,10 +97,10 @@ class Rasp(ApiBasic):
         return r.json()
 
     @staticmethod
-    def _get_stops(thread_uid: str,
-                   lang: str,
-                   system: str,
-                   date: Optional[str] = None) -> dict:
+    def _get_thread_info(thread_uid: str,
+                         lang: str,
+                         system: str,
+                         date: Optional[str] = None) -> dict:
         date = _optional_date_conversation(date)
         query_tuple = _base_query_tuple + (
             f'uid={thread_uid}',
@@ -113,11 +114,23 @@ class Rasp(ApiBasic):
         r = requests.get(url)
         return r.json()
 
-    def stops(self,
-              thread_uid: str,
-              date: Optional[str] = None) -> dict:
+    def thread_info(self,
+                    thread_uid: str,
+                    date: Optional[str] = None) -> dict:
         kwargs = {'thread_uid':thread_uid, 'date':date}
-        for k in getfullargspec(self._get_stops).args:
+        for k in getfullargspec(self._get_thread_info).args:
             if k not in kwargs:
                 kwargs[k] = self._call_kwargs[k]
-        return self.get_stops(**kwargs)
+        return self.get_thread_info(**kwargs)
+
+    def time_of_stop_at(self,
+                       thread_uid: str,
+                       date: Optional[str] = None) -> Optional[str]:
+        system = self._call_kwargs['system']
+        stop_station = self._call_kwargs['stop_station']
+        stops = self.thread_info(thread_uid, date)['stops']
+        for stop in stops:
+            if stop['station']['codes'][system] == stop_station:
+                time = stop['station']['arrival'] or stop['station']['departure']
+                return time
+        return None
