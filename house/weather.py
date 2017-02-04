@@ -1,7 +1,8 @@
 import requests
-from urllib.parse import urljoin
 from functools import reduce
-from typing import Optional, SupportsFloat, Tuple, Union
+from numbers import Real
+from typing import Optional, SupportsInt, SupportsFloat, Tuple, Union
+from urllib.parse import urljoin
 from .secrets import weather_underground_api_key
 from .tools import ApiBasic
 
@@ -45,15 +46,15 @@ def wind_dir(s: str, nesw: str = 'СВЮЗ') -> str:
     return s
 
 
-def precipitation(x: Union[int, float, str]) -> str:
+def precipitation(x: Union[Real, str]) -> str:
     return str(x).replace('.', ',')
 
 
-def pressure(mbar: SupportsFloat) -> str:
-    return '{:.3f}'.format(float(mbar) / 1000).replace('.', ',')
+def pressure(mbar: SupportsInt) -> str:
+    return str(int(mbar) - 1000)
 
 
-def temperature(x: Union[int, float, str]) -> str:
+def temperature(x: Union[Real, str]) -> str:
     return str(x).replace('-', '&minus;').replace('.', ',')
 
 

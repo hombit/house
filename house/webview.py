@@ -27,7 +27,7 @@ class HTMLStrings:
             rel_hum_now = w_now['relative_humidity']
             pres_now = weather.pressure(w_now['pressure_mb'])
             cond_now = w_now['weather']
-            str_now = f'{cond_now}{self.SPACE} {temp_now}&nbsp;&deg;C&nbsp;({temp_feels_now}&nbsp;&deg;C){self.SPACE} {rel_hum_now}{self.SPACE} {wind_dir_now}&nbsp;{wind_now}&nbsp;м/с{self.SPACE} {pres_now}&nbsp;бар'
+            str_now = f'{cond_now}{self.SPACE} {temp_now}&nbsp;&deg;C&nbsp;({temp_feels_now}&nbsp;&deg;C){self.SPACE} {rel_hum_now}{self.SPACE} {wind_dir_now}&nbsp;{wind_now}&nbsp;м/с{self.SPACE} {pres_now}&nbsp;мбар'
 
             w_astro = jw['moon_phase']
             moon_phase = w_astro['phaseofMoon']
