@@ -51,7 +51,7 @@ def precipitation(x: Union[Real, str]) -> str:
 
 
 def pressure(mbar: SupportsInt) -> str:
-    return str(int(mbar) - 1000)
+    return str(int(mbar) - 1000).replace('-', '&minus;')
 
 
 def temperature(x: Union[Real, str]) -> str:
