@@ -1,0 +1,24 @@
+{
+  web: {
+    auto_refresh_rate: 15,
+    runtime_to_station: 900,
+    rasp_time_interval: 7200,
+    rasp_min_count: 8,
+  },
+  weather: {
+    cache_size: 50,
+    cache_ttl: 720,
+    location: 'Russia/Moscow',
+    'lang': 'RU',
+  },
+  rasp: {
+    cache_size: 50,
+    cache_ttl: 900,
+    transport_types: 'suburban',
+    system: 'express',
+    from_station: '2001143',  // Мичуринец
+    to_station: '2000007',  // Москва Киевская
+    stop_station: '2001069',  // Москва Сортировочная
+    lang: 'ru',
+  },
+}
