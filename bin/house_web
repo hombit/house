@@ -49,4 +49,4 @@ def pda() -> str:
 
 
 if __name__ == '__main__':
-    run(app, server='gunicorn', host='0.0.0.0', port=15134)
+    run(app, server='cherrypy', host='0.0.0.0', port=15134)
