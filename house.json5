@@ -9,7 +9,7 @@
     cache_size: 50,
     cache_ttl: 720,
     location: 'Russia/Moscow',
-    'lang': 'RU',
+    lang: 'RU',
   },
   rasp: {
     cache_size: 50,
