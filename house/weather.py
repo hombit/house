@@ -1,7 +1,7 @@
 import requests
 from functools import reduce
 from numbers import Real
-from typing import Optional, SupportsInt, SupportsFloat, Tuple, Union
+from typing import Optional, SupportsFloat, Tuple, Union
 from urllib.parse import urljoin
 from .secrets import weather_underground_api_key
 from .tools import ApiBasic
@@ -50,8 +50,8 @@ def precipitation(x: Union[Real, str]) -> str:
     return str(x).replace('.', ',')
 
 
-def pressure(mbar: SupportsInt) -> str:
-    return str(int(mbar) - 1000).replace('-', '&minus;')
+def pressure(mbar: SupportsFloat) -> str:
+    return str(float(mbar) - 1000).replace('-', '&minus;').replace('.', ',')
 
 
 def temperature(x: Union[Real, str]) -> str:
