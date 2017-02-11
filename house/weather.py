@@ -51,7 +51,7 @@ def precipitation(x: Union[Real, str]) -> str:
 
 
 def pressure(mbar: SupportsFloat) -> str:
-    return str(float(mbar) - 1000).replace('-', '&minus;').replace('.', ',')
+    return '{:.3g}'.format(float(mbar) - 1000).replace('-', '&minus;').replace('.', ',')
 
 
 def temperature(x: Union[Real, str]) -> str:
