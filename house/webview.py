@@ -65,7 +65,11 @@ class HTMLStrings:
             for x in rt:
                 hm = x['departure_datetime'].strftime('%H:%M')
                 minutes = ceil((x['departure_datetime'] - rt.now).seconds / 60)
-                title = x['thread']['title'][0]
+                title = x['thread']['title']
+                if title.lower().startswith('аэропорт'):
+                    title = 'В'  # '&#9992;'
+                else:
+                    title = title[0]
                 thread = f'{title}&nbsp;{hm}&nbsp;({minutes})'
                 if not self.r.have_a_stop_at(x['thread']['uid']):
                     thread = f'<i>{thread}</i>'
