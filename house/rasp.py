@@ -16,8 +16,8 @@ T = TypeVar('T')
 _base_url = 'https://api.rasp.yandex.net/v1.0/'
 
 
-_base_query_tuple = (f'apikey={yandex_api_key}',
-                     'format=json',)
+_base_query_params = {'apikey': yandex_api_key,
+                      'format': 'json',}
 
 
 def _days_after_today(x: int = 0) -> str:
@@ -82,18 +82,15 @@ class Rasp(ApiBasic):
              date: Optional[str] = None,
              **kwargs) -> dict:
         date = _optional_date_conversation(date)
-        query_tuple = _base_query_tuple + (
-            f'from={from_station}',
-            f'to={to_station}',
-            f'lang={lang}',
-            f'date={date}',
-            f'system={system}',
-            f'transport_types={transport_types}',
-        )
-        query = '?' + '&'.join(query_tuple)
-        search_url = urljoin(_base_url, 'search/')
-        url = urljoin(search_url, query)
-        r = requests.get(url)
+        query_params = {'from': from_station,
+                        'to': to_station,
+                        'lang': lang,
+                        'date': date,
+                        'system': system,
+                        'transport_types': transport_types,}
+        query_params.update(_base_query_params)
+        url = urljoin(_base_url, 'search/')
+        r = requests.get(url, params=query_params)
         return r.json()
 
     @staticmethod
@@ -102,16 +99,13 @@ class Rasp(ApiBasic):
                          system: str,
                          date: Optional[str] = None) -> dict:
         date = _optional_date_conversation(date)
-        query_tuple = _base_query_tuple + (
-            f'uid={thread_uid}',
-            f'lang={lang}',
-            f'date={date}',
-            f'show_systems={system}',
-        )
-        query = '?' + '&'.join(query_tuple)
-        stops_url = urljoin(_base_url, 'thread/')
-        url = urljoin(stops_url, query)
-        r = requests.get(url)
+        query_params = {'uid': thread_uid,
+                        'lang': lang,
+                        'date': date,
+                        'show_systems': system,}
+        query_params.update(_base_query_params)
+        url = urljoin(_base_url, 'thread/')
+        r = requests.get(url, params=query_params)
         return r.json()
 
     def thread_info(self,
