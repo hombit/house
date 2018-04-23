@@ -4,6 +4,20 @@ services:
      build: .
      env_file:
        - secrets.env
-     ports:
-      - "127.0.0.1:15134:15134"
+     expose:
+       - "15134"
+     networks:
+       - proxy
+     environment:
+       VIRTUAL_HOST: home.homb.it
+       VIRTUAL_PORT: "15134"
+       HTTPS_METHOD: noredirect
+       DYNDNS_HOST: home.homb.it
+       LETSENCRYPT_HOST: home.homb.it
+       LETSENCRYPT_EMAIL: home@homb.it
      restart: always
+
+networks:
+  proxy:
+    external:
+      name: proxy
